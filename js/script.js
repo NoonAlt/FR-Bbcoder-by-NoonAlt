@@ -5,8 +5,20 @@ function normalizeInputText(inputText) {
 
 // Parse the input text to extract dragon data
 function parseDragonData(rawInput) {
+    const warningEl = document.getElementById("dragon-warning"); // ← add this
+
+    // If the element is missing, fallback to alert
+    const showWarning = msg => {
+        if (warningEl) {
+            warningEl.textContent = msg;
+            warningEl.classList.remove("hidden");
+        } else {
+            alert(msg);
+        }
+    }
+
     if (!rawInput || rawInput.trim() === "") {
-        alert("Please provide some input!");
+        showWarning("Please provide some input!");
         return null;
     }
 
@@ -78,13 +90,23 @@ function parseDragonData(rawInput) {
     }
 
     // Extract Offspring Status
-    const offspringMatch = normalizedText.match(/Offspring\s+([^\n]+)/);
+    const offspringMatch = normalizedText.match(/Offspring\s*(.*)/i);
     if (offspringMatch) {
-        offspringStatus = offspringMatch[1].includes("none") ? "Unbred" : "1+";
+        const offspringText = offspringMatch[1].trim();
+        if (offspringText === "") {
+            offspringStatus = ""; // or "Unknown"
+        } else if (/none/i.test(offspringText)) {
+            offspringStatus = "Unbred";
+        } else {
+            offspringStatus = "1+";
+        }
+    } else {
+        offspringStatus = ""; // or "Unknown"
     }
 
+
     // Determine Unnamed Lineage
-    if (parentsStatus.includes("Unnamed") || offspringMatch[1].includes("Unnamed")) {
+    if (parentsStatus.includes("Unnamed") || (offspringMatch && offspringMatch[1].includes("Unnamed"))) {
         unnamedLineage = "Yes";
     }
 
@@ -105,6 +127,31 @@ function parseDragonData(rawInput) {
     silhouetteScroll = /Silhouette Scroll/i.test(normalizedText) ? "Yes" : "No";
     reflectionScroll = /Reflection Scroll/i.test(normalizedText) ? "Yes" : "No";
 
+    const requiredFields = {
+        "Name": name,
+        "ID": id,
+        "Breed": breed,
+        "Hatchday": hatchday,
+        "Sex": sex,
+        "Parents Status": parentsStatus,
+        "Offspring Status": offspringStatus,
+        "Eye Type": eyeType,
+        "Element": element
+    };
+
+    // Gather missing/unknown fields
+    const missingFields = [];
+    for (const [field, value] of Object.entries(requiredFields)) {
+        if (!value || value === "Unknown") {
+            missingFields.push(field);
+        }
+    }
+
+    if (missingFields.length > 0) {
+        showWarning(`Warning: Could not parse the following required fields: ${missingFields.join(", ")}`);
+    }
+
+
     // Return extracted data
     const parsedData = {
         Name: name, ID: id, Breed: breed, "Primary Color": primaryColor, "Primary Gene": primaryGene,
@@ -115,10 +162,7 @@ function parseDragonData(rawInput) {
         "Silhouette Scroll": silhouetteScroll, "Reflection Scroll": reflectionScroll, Generation: generation
     };
 
-    // Store parsed data in a hidden element
     document.getElementById("parsed-data-json").textContent = JSON.stringify(parsedData);
-
-    // Call the BBCode generator after parsing
     updateBBCode();
 
     return parsedData;
@@ -140,11 +184,6 @@ document.getElementById("parse-button").addEventListener("click", () => {
         row.innerHTML = `<td>${field}</td><td>${value}</td>`;
         tableBody.appendChild(row);
     }
-
-    // Assign Sale Information variables to the values found in the table
-    document.getElementById("sale-price").value = parsedData["Price"] || "";
-    document.getElementById("sale-currency").value = parsedData["Currency"] || "";
-    document.getElementById("sale-notes").value = parsedData["Other notes"] || "";
 });
 
 // Event listener for clearing input
@@ -257,22 +296,21 @@ document.getElementById("parse-button").addEventListener("click", () => {
 });
 
 // Add copy buttons to Image BBCode textareas
-document.querySelectorAll("#image-bbcode-generator textarea").forEach((textarea) => {
-    const copyButton = document.createElement("button");
-    copyButton.classList.add("bbcode-copy-button");
-    copyButton.textContent = "Copy";
-    textarea.addEventListener("click", () => {
-        textarea.select();
-        document.execCommand("copy");
-        const popup = document.getElementById('copy-popup');
-        popup.classList.add('show');
-        setTimeout(() => {
-            popup.classList.remove('show');
-        }, 3000);
+document
+  .querySelectorAll('#image-bbcode-generator input[type="text"]')
+  .forEach((input) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'bbcode-copy-button';
+    button.textContent = 'Copy';
+
+    button.addEventListener('click', () => {
+      navigator.clipboard.writeText(input.value);
     });
-    textarea.parentNode.style.position = 'relative';
-    textarea.parentNode.appendChild(copyButton);
-});
+
+    input.parentNode.appendChild(button); // parent is <td>
+  });
+
 
 // Event listener for "For sale?" checkbox
 document.getElementById("for-sale-checkbox").addEventListener("change", (event) => {
@@ -1014,6 +1052,7 @@ document.addEventListener("DOMContentLoaded", () => {
      const forSaleCheckbox = document.getElementById("for-sale-checkbox");
     forSaleCheckbox.checked = true; // Ensure the checkbox is checked
     forSaleCheckbox.dispatchEvent(new Event("change")); // Trigger the change event
+    
 });
 
 // Generate template text from current blocks

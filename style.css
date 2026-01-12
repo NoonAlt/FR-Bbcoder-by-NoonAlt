@@ -106,25 +106,32 @@ textarea {
   margin-top: 10px;
 }
 
-.bbcode-copy-button {
-    position: absolute;
-    top: 0;
-    right: 0;
-    border: px;
-    border-color: #ddd;
-    cursor: pointer;
-    font-size: 12px;
-    padding: 2px;
-    display: none;
-    background-color: #ddd;
-    border-radius: 10%;
-    opacity: 80%;
+.bbcode-wrapper {
+    position: relative;
 }
 
-#image-bbcode-generator textarea:hover + .bbcode-copy-button,
-#image-bbcode-generator textarea:focus + .bbcode-copy-button {
-    display: inline;
+#image-bbcode-generator td {
+    position: relative;
 }
+
+.bbcode-copy-button {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 12px;
+    padding: 2px 4px;
+    background-color: #ddd;
+    border-radius: 10%;
+    cursor: pointer;
+    opacity: 0.8;
+    display: none;
+}
+
+    #image-bbcode-generator td:hover .bbcode-copy-button,
+    #image-bbcode-generator td:focus-within .bbcode-copy-button {
+    display: inline-block;
+}
+
 
 .sidebar {
     transition: transform 0.2s ease-in-out, width 0.2s ease-in-out;
