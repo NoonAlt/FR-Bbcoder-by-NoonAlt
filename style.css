@@ -1,0 +1,383 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #cccccc;
+    color: #333;
+    overflow-x: hidden;
+}
+
+textarea {
+    width: 100%;
+    padding: 0.5em;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-family: monospace;
+}
+
+#header {
+    box-sizing: content-box;
+    width: 100%;
+} 
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 0.5em;
+    text-align: left;
+}
+
+th {
+    background: #f4f4f9;
+}
+
+#image-bbcode-generator th, #image-bbcode-generator td {
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+#image-bbcode-generator textarea {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: 20px;
+    resize: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#drag-drop-area {
+  border: 2px dashed #ccc;
+  padding: 1rem;
+  background-color: #E5E7EB;
+  margin-bottom: 20px;
+  min-height: 100px;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  overflow: auto;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.block {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+    
+}
+
+input, select {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.drag-handle {
+    cursor: grab;
+    padding: 0.125em;
+    background-color: #ddd;
+    border-radius: 3px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.no-select {
+    user-select: none;
+}
+
+.copy-icon-button {
+    background: url('copy.svg') no-repeat center center;
+    background-size: contain;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+}
+
+.bbcode-copy-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: px;
+    border-color: #ddd;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px;
+    display: none;
+    background-color: #ddd;
+    border-radius: 10%;
+    opacity: 80%;
+}
+
+#image-bbcode-generator textarea:hover + .bbcode-copy-button,
+#image-bbcode-generator textarea:focus + .bbcode-copy-button {
+    display: inline;
+}
+
+.sidebar {
+    transition: transform 0.2s ease-in-out, width 0.2s ease-in-out;
+    overflow: hidden;
+}
+
+.sidebar-closed .p-4 {
+    display: none; 
+}
+
+.sidebar-open {
+    transform: translateX(0);
+    width: 20rem;
+}
+
+.sidebar-open .p-4 {
+    display: block; 
+}
+
+@media (max-width: 1024px) { 
+    .sidebar {
+        position: fixed;
+        z-index: 30;
+        height: 100vh;
+        top: 0;
+        overflow-y: scroll;
+    }
+    .sidebar-open {
+        transform: translateX(0);
+    }
+    .sidebar-closed {
+        transform: translateX(-100%);
+        width: 3em;
+    }
+    .sidebar-open ~ main,
+    .sidebar-closed ~ main {
+        margin-left: 0;
+    }
+    #toggle-sidebar-small {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        z-index: 20;
+        width: 2rem;
+        height: 2rem;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM64 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L96 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"/></svg>') no-repeat center center;
+        background-size: contain;
+        border: none;
+        cursor: pointer;
+        filter: invert(1);
+    }
+    .sidebar-open + #toggle-sidebar-small {
+        display: none;
+    }
+    .sidebar-closed + #toggle-sidebar-small {
+        display: block;
+    }
+    .sidebar-open #close-sidebar-small {
+        display: block;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 2rem;
+        height: 2rem;
+        background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"%3E%3Cpath d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"%3E%3C/path%3E%3C/svg%3E') no-repeat center center;
+        background-size: contain;
+        border: none;
+        cursor: pointer;
+        transform: rotate(180deg);
+    }
+    .sidebar-closed #close-sidebar-small {
+        display: none;
+    }
+}
+
+@media (min-width: 1025px) {
+    .sidebar-closed {
+        transform: translateX(0);
+        width: 3em;
+    }
+    .sidebar-open {
+        transform: translateX(0);
+        width: 20rem;
+    }
+    .sidebar-open .p-4 {
+        display: block;
+    }
+    .sidebar-closed .p-4 {
+        display: none;
+    }
+    #toggle-sidebar {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 2rem;
+        height: 2rem;
+        background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"%3E%3Cpath d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"%3E%3C/path%3E%3C/svg%3E') no-repeat center center;
+        background-size: contain;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
+    }
+    .sidebar-open #toggle-sidebar {
+        transform: rotate(180deg);
+    }
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.flex-content {
+    display: flex;
+    flex: 1;
+}
+
+.main-content {
+    flex: 1;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 50;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 40;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.modal:not(.hidden),
+.modal-overlay:not(.hidden) {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.copy-popup {
+    visibility: hidden;
+    min-width: 200px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 10px;
+    position: fixed;
+    z-index: 50;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px;
+}
+
+.copy-popup.show {
+    visibility: visible;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+.circle-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid gray;
+    border-radius: 50%; /* Make it a circle */
+    outline: none;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .circle-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0.60rem; /* Adjust size of the dot */
+    height: 0.60rem; /* Adjust size of the dot */
+    background-color: gray; /* Dot color */
+    border-radius: 50%; /* Make the dot a circle */
+    transform: translate(-50%, -50%);
+  }
+
+.bg-pink {
+    background-color: #ecb3d5;
+}
+
+ol.list-decimal > li::marker {
+    font-weight: bold;
+}

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dragon Card Maker</title>
+  <link href="./dist/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/heroicons@1.0.6/outline/style.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+  <script src="js/lz-string.min.js"></script>
+</head>
+<body class="flex flex-col min-h-screen bg-gray-300">
+  <!-- Header -->
+  <div id="header" class="bg-gray-800 text-white p-4 text-center relative">
+    <h1 class="text-3xl font-bold">Dragon Card Maker</h1>
+    <button id="toggle-sidebar-small" class="lg:hidden"></button>
+  </div>
+
+ <!-- Flex Container for Sidebar and Main Content -->
+  <div class="flex-content flex gap-2">
+
+     <div id="sidebar" class="sidebar bg-white shadow-lg lg:sidebar-open sidebar-closed">
+      <button id="toggle-sidebar" class="absolute top-4 right-0"></button>
+      <button id="close-sidebar-small" class="lg:hidden"></button>
+        <div class="p-4">
+          <h2 class="text-xl font-bold mb-4">Guide</h2>
+          <div id="sidebar-content">
+            <h3><strong>Input your dragon's info</strong></h3>
+            <div id="sidebar-guide-1" class="bg-gray-100 rounded-lg border p-2 mt-2 mb-2">
+              <p><strong>1.</strong> Select all text on the dragon's profile from name to offspring.</p>
+              <p><strong>2.</strong> Copy it, and paste it into the first window.</p>
+              <p><strong>3.</strong> Press parse, and all information will be auto-filled into the table below!</p>
+              <img src="images/dragonselect.png" alt="Image showing how to select the text, starting from the name of the dragon and ending at first offspring." style="width: fit-content;">
+            </div>
+            <h3><strong>How to use the BBcode Builder</strong></h3>
+            <div id="sidebar-guide-2" class="bg-gray-100 rounded-lg border p-2 mt-2">
+              <p><strong>1.</strong> To start, press "Add Block"</p>
+              <p><strong>2.</strong> Type bbcode into "Text before" and "Text after" or select a premade block by pressing the "Pre-Made Blocks" button.</p>
+              <p><strong>3.</strong> Select a variable from the middle drop down menu.</p>
+              <p><strong>4.</strong> Drag blocks around to organize them. Some blocks can have other blocks nested into them - drag a block into the gray area, or press the nest icon (4th) on a nestable block to nest it into the block above it. Press the unnest icon (5th) to unnest it again. Press the minus icon (first) to hide all nested elements.</p>
+              <p><strong>5.</strong> Copy the bbcode from the "Generated BBCode" window below.</p>
+              <p><strong>6.</strong> If you'd like to save a draft, click "Save Draft" and input the draft name. This will be temporarily saved in your browser. Press "Load Draft" to load a saved draft.</p>
+              <p><strong>7.</strong> To save your creation for later use (or to share with others), click "Save Template". You can then copy the URL to share it, or bookmark the page.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  <main class="flex flex-col lg:grid lg:grid-cols-[max-content_max-content_1fr] lg:gap-8 mt-4">
+    <!-- Left Column -->
+    <div class="w-full max-w-full lg:max-w-lg lg:ml-4">
+      <!-- Section 1: Input Raw Text -->
+      <section id="input-section" class="border rounded-lg shadow-lg mb-4 p-4 bg-white relative">
+        <h2 class="text-xl font-bold mb-4">Input Window</h2>
+        <button class="absolute top-4 right-4 text-gray-500 hover:text-gray-700" onclick="openTutorialModal('input')">
+          <i class="fa-solid fa-question-circle"></i>
+        </button>
+        <textarea id="raw-input" rows="10" placeholder="Paste your dragon profile text here..." class="border p-2 w-full"></textarea>
+        <button id="parse-button" class="bg-pink text-black p-2 mt-2 rounded-lg">Parse</button>
+        <button id="clear-button" class="bg-pink text-black p-2 mt-2 rounded-lg">Clear</button>
+        <button id="quick-copy-button" class="bg-pink text-black p-2 mt-2 rounded-lg">Quick Copy</button>
+      </section>
+  
+      <!-- Section 2: Parsed Data -->
+      <section class="collapsible rounded-lg shadow-lg mb-4">
+        <button onclick="toggleSection('parsed-data')" 
+                class="w-full p-4 text-left bg-pink text-black font-bold flex justify-between items-center rounded-t-lg">
+            Your Dragon's Info
+            <i id="parsed-data-arrow" class="fa-solid fa-caret-up transform transition-transform duration-300"></i>
+        </button>
+        <div id="parsed-data" class="p-4 bg-white border-t rounded-b-lg">
+          <table id="data-table">
+            <thead>
+              <tr>
+                <th>Variable</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Parsed Data table content (updated on "Parse") -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  
+    <!-- Middle Column -->
+  <div class="w-full max-w-full lg:max-w-md">
+      <!-- Hidden elements to store parsed data for BBCode generation -->
+      <div id="parsed-data-json" style="display: none;"></div>
+  
+      <!-- Section 3: Image BBCode Generator -->
+      <section class="shadow-lg mb-4 bg-white rounded-lg">
+        <button onclick="toggleSection('image-bbcode-generator')" 
+                class="w-full p-4 text-left bg-pink text-black font-bold flex justify-between items-center rounded-t-lg">
+            Image BBCode
+            <i id="image-bbcode-generator-arrow" class="fa-solid fa-caret-up transform transition-transform duration-300 ml-2"></i>
+        </button>
+        <div id="image-bbcode-generator" class="p-4 bg-white border-t rounded-b-lg w-full">
+          <table>
+            <thead>
+              <tr>
+                <th>Format</th>
+                <th>Image</th>
+                <th>Clickable Image</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Full (350)</td>
+                <td><textarea id="image-350" readonly></textarea></td>
+                <td><textarea id="clickable-350" readonly></textarea></td>
+              </tr>
+              <tr>
+                <td>Avatar</td>
+                <td><textarea id="image-avatar" readonly></textarea></td>
+                <td><textarea id="clickable-avatar" readonly></textarea></td>
+              </tr>
+              <tr>
+                <td>Portrait</td>
+                <td><textarea id="image-portrait" readonly></textarea></td>
+                <td><textarea id="clickable-portrait" readonly></textarea></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    
+  
+      <!-- Extra Variable Toggle Section -->
+      <section id="collapsible-extra-variable-toggle" class="shadow-lg mb-4 bg-white rounded-lg relative">
+        <div class="relative">
+          <button onclick="toggleSection('extra-variable-toggle')" 
+                  class="w-full p-4 text-left bg-pink text-black font-bold flex justify-between items-center rounded-t-lg relative z-10">
+            Extra Variables
+            <i id="extra-variable-toggle-arrow" class="fa-solid fa-caret-up transform transition-transform duration-300 ml-2"></i>
+          </button>
+        </div>
+        <div id="extra-variable-toggle" class="flex-col p-4 bg-white border-t rounded-b-lg space-y-1 z-0 relative">      
+          <div class="flex items-center space-x-2">
+            <button class="absolute right-4 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 z-20" 
+                  onclick="openTutorialModal('extra-variables')">
+            <i class="fa-solid fa-question-circle"></i>
+          </button>
+            <label for="for-sale-checkbox">For sale?</label>
+            <input type="checkbox" id="for-sale-checkbox" class="circle-checkbox" checked>
+          </div>
+          <div id="sale-info" style="display: none;">
+            <table>
+              <tr>
+                <td>Price (enter number)</td>
+                <td><input type="text" placeholder="Type number here..." id="sale-price"></td>
+              </tr>
+              <tr>
+                <td>Currency</td>
+                <td>
+                  <select id="sale-currency" class="border border-gray-300 rounded p-1 text-sm max-w-32">
+                    <option value=""></option>
+                    <option value="g">g</option>
+                    <option value="t">t</option>
+                    <option value="kt">kt</option>
+                    <option value="kt/g">kt/g</option>
+                    <option value="Unlisted">Unlisted</option>
+                    <option value="Taking offers">Taking offers</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>Other notes</td>
+                <td><input type="text" placeholder="Type text here..." id="sale-notes"></td>
+              </tr>
+            </table>
+          </div>
+            <div class="flex items-center space-x-2">
+              <label for="display-scrolls-emojis">Display scrolls as emojis</label>
+            <input type="checkbox" id="display-scrolls-emojis" class="circle-checkbox"></div>
+            <div class="flex items-center space-x-2">
+              <label for="custom-variables-checkbox">Custom variables</label>
+              <input type="checkbox" id="custom-variables-checkbox" class="circle-checkbox" checked>
+            </div>
+            <div id="custom-variables-inputs" style="display: none;">
+              <table>
+                <tr>
+                  <td>Custom variable 1.</td>
+                  <td><input type="text" placeholder="Type text here..." id="custom-variable-value-1"></td>
+                </tr>
+                <tr>
+                  <td>Custom variable 2.</td>
+                  <td><input type="text" placeholder="Type text here..." id="custom-variable-value-2"></td>
+                </tr>
+                <tr>
+                  <td>Custom variable 3.</td>
+                  <td><input type="text" placeholder="Type text here..." id="custom-variable-value-3"></td>
+                </tr>
+                <tr>
+                  <td>Custom variable 4.</td>
+                  <td><input type="text" placeholder="Type text here..." id="custom-variable-value-4"></td>
+                </tr>
+                <tr>
+                  <td>Custom variable 5.</td>
+                  <td><input type="text" placeholder="Type text here..." id="custom-variable-value-5"></td>
+                </tr>
+              </table>
+            </div>
+     </section>
+  </div>
+  
+    <!-- Right Column -->
+    <div class="w-full max-w-full lg:max-w-lg flex items-start gap-4">
+      <!-- Section 4: Custom BBcode Builder -->
+      <section class="collapsible rounded-lg shadow-lg mb-4 w-full relative">
+        <div class="relative">
+        <button onclick="toggleSection('bbcode-builder')" 
+                class="w-full p-4 text-left bg-pink text-black font-bold flex justify-between items-center rounded-t-lg relative z-10">
+            BBCode Builder
+            <i id="bbcode-builder-arrow" class="fa-solid fa-caret-up transform transition-transform duration-300 ml-2"></i>
+        </button>
+        <button class="absolute top-1/2 right-12 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 z-20" onclick="openTutorialModal('bbcode-builder')">
+          <i class="fa-solid fa-question-circle"></i>
+        </button>
+      </div>
+        <div id="bbcode-builder" class="p-4 bg-white border-t rounded-b-lg">
+          <div id="bbcode-builder">
+              <div id="drag-drop-area" class="border-2 border-dashed border-gray-300">
+              </div>
+              <button id="add-block" class="bg-pink text-black p-2 mt-2 rounded-lg">Add Block</button>
+              <button id="toggle-premade-panel" class="bg-pink text-black p-2 mt-2 rounded-lg">Pre-Made Blocks</button>
+              <button id="bbcode-guide-button" class="bg-pink text-black p-2 mt-2 rounded-lg">BBCode Guide</button>
+              <button id="save-url" class="bg-pink text-black p-2 mt-2 rounded-lg">Save Template</button>
+              <button id="load-url" class="bg-pink text-black p-2 mt-2 rounded-lg">Load Template</button>
+              <button id="save-storage" class="bg-pink text-black p-2 mt-2 rounded-lg">Save Draft</button>
+              <button id="load-storage" class="bg-pink text-black p-2 mt-2 rounded-lg">Load Draft</button>
+      
+              <!--Pre-made blocks pannel-->
+             <div id="premade-panel" class="flex-grow flex flex-col p-4 bg-gray-100 w-full">
+             <h3 class="text-lg font-bold mb-2">Pre-Made Blocks</h3>
+             <div id="premade-blocks" class="flex flex-col gap-2">
+             <!-- Pre-made blocks added dynamically via JavaScript -->
+              </div>
+              </div>
+
+             <!-- BBcode guide content -->
+                <div id="guide-content" class="flex-grow flex flex-col p-4 bg-gray-100 w-full" style="display: none;">
+                  <h2><strong>Alignment</strong></h2>
+                  <p><strong>Center:</strong> [center]Text[/center]</p>
+                  <p><strong>Right:</strong> [right]Text[/right]</p>
+                  <p><strong>Left:</strong> [left]Text[/left]</p>
+                  <p><strong>Indent:</strong> [indent]Text[/indent]</p>
+                  <p><strong>List</strong> [list][*]Item 1[*]Item 2[/list]</p>
+                  <p><strong>...</strong></p>
+                  <p><strong>Link:</strong> [url=URL]Text[/url]</p>
+                  <p><strong>Image:</strong> [img]URL[/img]</p>
+                  <p><strong>Image with link:</strong> [url=URL][img]URL[/img][/url]</p>
+                  <p><strong>Quote:</strong> [quote]Text[/quote]</p>
+                  <p><strong>Quote with title:</strong> [quote name "NAME" date="DATE"]Quoted Text[/quote]</p>
+                  <p><i>Date can be removed from quote titles, but do not forget quotation marks in the name and date text.</i></p>
+                  <p><strong>Code:</strong> [code]Text[/code]</p>
+                  <p><strong>Divider:</strong> ----- or [rule]</p>
+                  <p><strong>Columns:</strong> [columns]Text column 1[nextcol] Text column 2[/columns]</p> 
+                  <p><i>Use [nextcol] to create more columns.</i></p>
+                  <p><strong>Hidden:</strong> [hidden]Text[/hidden]</p> 
+                  <p><strong>Hidden with title:</strong> [hidden title=TITLE]Text[/hidden]</p>
+                  <br>
+                  <h2><strong>Text effects</strong></h2>
+                  <p><strong>Color:</strong> [color=COLOR ID]Text[/color]</p>
+                  <p><strong>Size:</strong> [size=NUMBER 0-7]Text[/size]</p>
+                  <p><strong>Font:</strong> [font=FONT NAME]Text[/font]</p>
+                  <br>
+                  <h2><strong>Flight rising BBcode</strong></h2>
+                  <p><strong>Item icon:</strong> [item=ITEM NAME]</p>
+                  <p><strong>Item database link:</strong> [gamedb item=ITEM ID]</p>
+                  <p><strong>Skin/Accent:</strong> [item=Skin: SKIN NAME] or [item=Accent: ACCENT NAME]</p>
+                  <p><strong>User icon:</strong> [user=ID]</p>
+                  <p><strong>Outfit:</strong> [outfit=OUTFIT ID]</p>
+                  <p><strong>Morhology:</strong> [morphology=MORPHOLOGY ID]</p>
+                  <p><strong>Effect preview:</strong> [effect dragon=DRAGON ID]</p>
+                </div>
+
+              <div id="bbcode-output">
+                <h3 class="p-2">Generated BBCode:</h3>
+                <textarea id="bbcode-result" readonly></textarea>
+                <button id="copy-bbcode" class="bg-pink text-black p-2 mt-2 rounded-lg">Copy to Clipboard</button>
+              </div>
+            </div>
+        </div>
+      </section>
+    </div>
+
+ <!-- Tutorial Modal -->
+  <div id="tutorial-modal" class="modal hidden fixed inset-0 items-center justify-center z-50">
+    <div class="modal-content bg-white p-6 rounded-lg shadow-lg relative max-w-lg w-full">
+      <span class="close absolute top-2 right-2 text-gray-500 cursor-pointer" onclick="closeTutorialModal()">&times;</span>
+      <h2 id="tutorial-title" class="text-xl font-bold mb-4"></h2>
+      <p id="tutorial-content" class="bg-gray-100 rounded-lg border p-2 mt-2 mb-2 text-gray-700"></p>
+      <div id="tutorial-gif" class="flex justify-center items-center mt-4"></div>
+    </div>
+  </div>
+  <div id="tutorial-modal-overlay" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-50 z-40" onclick="closeTutorialModal()"></div>
+
+
+  <footer>
+    <p>&copy; 2025 Dragon Data Parser</p>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
