@@ -588,6 +588,10 @@ video {
   }
 }
 
+.collapse {
+  visibility: collapse;
+}
+
 .fixed {
   position: fixed;
 }
@@ -696,36 +700,24 @@ video {
   display: none;
 }
 
-.h-12 {
-  height: 3rem;
-}
-
 .h-5 {
   height: 1.25rem;
-}
-
-.min-h-screen {
-  min-height: 100vh;
 }
 
 .min-h-12 {
   min-height: 3rem;
 }
 
+.min-h-screen {
+  min-height: 100vh;
+}
+
 .w-5 {
   width: 1.25rem;
 }
 
-.w-96 {
-  width: 24rem;
-}
-
 .w-full {
   width: 100%;
-}
-
-.min-w-96 {
-  min-width: 24rem;
 }
 
 .min-w-64 {
@@ -978,6 +970,11 @@ video {
   font-weight: 700;
 }
 
+.\!text-gray-400 {
+  --tw-text-opacity: 1 !important;
+  color: rgb(156 163 175 / var(--tw-text-opacity, 1)) !important;
+}
+
 .text-black {
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity, 1));
@@ -996,6 +993,16 @@ video {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.\!text-gray-600 {
+  --tw-text-opacity: 1 !important;
+  color: rgb(75 85 99 / var(--tw-text-opacity, 1)) !important;
+}
+
+.\!text-gray-500 {
+  --tw-text-opacity: 1 !important;
+  color: rgb(107 114 128 / var(--tw-text-opacity, 1)) !important;
 }
 
 .shadow-lg {
@@ -1454,10 +1461,6 @@ ol.list-decimal > li::marker {
     display: none;
   }
 
-  .lg\:min-w-96 {
-    min-width: 24rem;
-  }
-
   .lg\:max-w-lg {
     max-width: 546.25px;
   }
@@ -1472,11 +1475,5 @@ ol.list-decimal > li::marker {
 
   .lg\:gap-8 {
     gap: 2rem;
-  }
-}
-
-@media (min-width: 640px) {
-  .sm\:min-w-64 {
-    min-width: 16rem;
   }
 }

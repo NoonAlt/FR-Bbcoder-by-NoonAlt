@@ -26,6 +26,9 @@
         <div class="p-4">
           <h2 class="text-xl font-bold mb-4">Guide</h2>
           <div id="sidebar-content">
+            <div id="sidebar-guide" class="!text-gray-500 rounded-lg border p-2 mt-2 mb-2">
+            <p><i>Click on <i class="fa-solid fa-question-circle"></i> icons to show section-specific tutorials.</i></p>
+            </div>
             <h3><strong>Input your dragon's info</strong></h3>
             <div id="sidebar-guide-1" class="bg-gray-100 rounded-lg border p-2 mt-2 mb-2">
               <p><strong>1.</strong> Select all text on the dragon's profile from name to offspring.</p>
@@ -38,10 +41,11 @@
               <p><strong>1.</strong> To start, press "Add Block"</p>
               <p><strong>2.</strong> Type bbcode into "Text before" and "Text after" or select a premade block by pressing the "Pre-Made Blocks" button.</p>
               <p><strong>3.</strong> Select a variable from the middle drop down menu.</p>
-              <p><strong>4.</strong> Drag blocks around to organize them. Some blocks can have other blocks nested into them - drag a block into the gray area, or press the nest icon (4th) on a nestable block to nest it into the block above it. Press the unnest icon (5th) to unnest it again. Press the minus icon (first) to hide all nested elements.</p>
-              <p><strong>5.</strong> Copy the bbcode from the "Generated BBCode" window below.</p>
-              <p><strong>6.</strong> If you'd like to save a draft, click "Save Draft" and input the draft name. This will be temporarily saved in your browser. Press "Load Draft" to load a saved draft.</p>
-              <p><strong>7.</strong> To save your creation for later use (or to share with others), click "Save Template". You can then copy the URL to share it, or bookmark the page.</p>
+              <p><strong>4.</strong> You can toggle additional options or add your own variables in the Extra Variables section.</p>
+              <p><strong>4.</strong> Drag blocks around using the handle icon <i class="fas fa-bars"></i>. 
+              <p><strong>5.</strong> Some blocks (columns, hidden, ...) can have other blocks nested into them - drag a block into the gray backgroud area, or press <i class="fa-solid fa-arrow-right-to-bracket" style="font-size: 1rem; width: 1rem; height: 1rem;"></i> on a nestable block to nest it into the block above it. Press <i class="fa-solid fa-arrow-right-from-bracket" style="font-size: 1rem; width: 1rem; height: 1rem;"></i> to unnest it again. Press the minus icon "<i class="fa-solid fa-minus" style="font-size: 1rem; width: 1rem; height: 1rem;"></i>" to collapse all nested elements.</p>
+              <p><strong>6.</strong> Copy bbcode to clipboard from the "Generated BBCode" window below.</p>
+              <p><strong>7.</strong> To save your build for later use (or to share with others), click "Save Template". You can then copy the URL to share it, or bookmark the page. Drafts are saved automatically.</p>
             </div>
           </div>
         </div>
@@ -229,8 +233,6 @@
               <button id="bbcode-guide-button" class="bg-pink text-black p-2 mt-2 rounded-lg">BBCode Guide</button>
               <button id="save-url" class="bg-pink text-black p-2 mt-2 rounded-lg">Save Template</button>
               <button id="load-url" class="bg-pink text-black p-2 mt-2 rounded-lg">Load Template</button>
-              <button id="save-storage" class="bg-pink text-black p-2 mt-2 rounded-lg">Save Draft</button>
-              <button id="load-storage" class="bg-pink text-black p-2 mt-2 rounded-lg">Load Draft</button>
       
               <!--Pre-made blocks pannel-->
              <div id="premade-panel" class="flex-grow flex flex-col p-4 bg-gray-100 w-full">
@@ -300,7 +302,7 @@
 
 
   <footer>
-    <p>&copy; 2025 Dragon Data Parser</p>
+    <p>&copy;</p>
   </footer>
 
   <script src="js/script.js"></script>

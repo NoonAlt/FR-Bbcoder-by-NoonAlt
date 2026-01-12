@@ -405,6 +405,14 @@ const variableList = [
 
 let dragDropArea;
 
+function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
 // Function to initialize the drag and drop area
 function initializeDragDropArea() {
     if (!dragDropArea) {
@@ -548,7 +556,11 @@ function createBlock(data = { inputBefore: "", variable: "", inputAfter: "", nes
         const deleteButton = document.createElement("button");
         deleteButton.classList.add("w-5", "h-5", "cursor-pointer", "flex", "items-center", "justify-center");
         deleteButton.innerHTML = `<i class="fa-regular fa-trash-can" style="font-size: 1.3rem; width: 1.3rem; height: 1.3rem;"></i>`;
-        deleteButton.addEventListener("click", () => block.remove());
+        deleteButton.addEventListener("click", () => {
+        block.remove();
+        updateBBCode();
+        window.debouncedAutoSave();
+        });
 
         const copyBlockButton = document.createElement("button");
         copyBlockButton.classList.add("w-5", "h-5", "rounded", "border-none", "cursor-pointer");
@@ -609,7 +621,11 @@ function createBlock(data = { inputBefore: "", variable: "", inputAfter: "", nes
         const deleteButton = document.createElement("button");
         deleteButton.classList.add("w-5", "h-5", "cursor-pointer", "flex", "items-center", "justify-center");
         deleteButton.innerHTML = `<i class="fa-regular fa-trash-can" style="font-size: 20px; width: 20px; height: 20px;"></i>`;
-        deleteButton.addEventListener("click", () => block.remove());
+        deleteButton.addEventListener("click", () => {
+        block.remove();
+        updateBBCode();
+        window.debouncedAutoSave();
+        });
 
         block.append(inputBefore, variableSelector, inputAfter, dragHandle, copyBlockButton, deleteButton);
 
@@ -633,6 +649,7 @@ function createBlock(data = { inputBefore: "", variable: "", inputAfter: "", nes
 
     dragDropArea.appendChild(block);
     updateBBCode();
+    window.debouncedAutoSave();  // Trigger auto-save after block creation
     console.log("Returning block:", block);
     return block;
 };
@@ -893,13 +910,47 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("parsed-data-json").textContent = JSON.stringify({});
     initializeDragDropArea();
 
+    // Create a debounced auto-save function (500ms delay)
+    const debouncedAutoSave = debounce(() => {
+    // Auto-save to fixed key (always save, even if empty)
+    const compressedTemplate = generateTemplateText(dragDropArea);
+    localStorage.setItem(`template_auto-draft`, compressedTemplate);
+    }, 500);
+
+    // Make it globally accessible
+    window.debouncedAutoSave = debouncedAutoSave;
+
+    // Hook debounced auto-save to relevant checkboxes and custom variable inputs
+    document.getElementById("for-sale-checkbox").addEventListener("change", debouncedAutoSave);
+    document.getElementById("custom-variables-checkbox").addEventListener("change", debouncedAutoSave);
+
+    // Custom variable input fields (text inputs) also trigger auto-save
+    document.querySelectorAll("#custom-variables-inputs input[type='text']").forEach(input => {
+        input.addEventListener("input", debouncedAutoSave);
+    });
+
     // Add event listener for the "Add Block" button
     const addBlockButton = document.getElementById("add-block");
     addBlockButton.addEventListener("click", () => createBlock());
 
-    // Listen for changes to update BBCode
-    dragDropArea.addEventListener("input", updateBBCode);
-    dragDropArea.addEventListener("change", updateBBCode);
+    // Listen for changes to update BBCode AND trigger debounced auto-save
+    dragDropArea.addEventListener("input", () => {
+        updateBBCode();
+        debouncedAutoSave();
+    });
+    dragDropArea.addEventListener("change", () => {
+        updateBBCode();
+        debouncedAutoSave();
+    });
+
+    // Also listen for Sortable drag-end to catch drag/drop edits
+    const sortableInstance = Sortable.get(dragDropArea);  // Assuming Sortable is initialized elsewhere
+    if (sortableInstance) {
+        sortableInstance.options.onEnd = (evt) => {
+            updateBBCode();
+            debouncedAutoSave();
+        };
+    }
 
     // Copy BBCode to clipboard
     const copyButton = document.getElementById("copy-bbcode");
@@ -930,11 +981,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // Render premade blocks
     renderPremadeBlocks();
 
-    // Check for template in URL hash
+    // Load auto-draft on page load (if exists)
+    const autoDraft = localStorage.getItem('template_auto-draft');
+    if (autoDraft) {
+        loadTemplateFromText(dragDropArea, autoDraft);
+    }
+
+    // Check for template in URL hash (after auto-draft load, if needed)
     if (window.location.hash) {
-    setTimeout(() => { // Delay to ensure dragDropArea is ready
-        loadTemplateFromURL(dragDropArea);
-    }, 100);
+        setTimeout(() => {
+            loadTemplateFromURL(dragDropArea);
+        }, 100);
     }
 
     // Add button for saving to URL
@@ -947,17 +1004,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const loadURLButton = document.getElementById("load-url");
     if (loadURLButton) {
         loadURLButton.addEventListener("click", () => loadTemplateFromURL(dragDropArea));
-    }
-
-    // Add buttons for local storage (assume buttons with ids="save-storage", "load-storage")
-    const saveStorageButton = document.getElementById("save-storage");
-    if (saveStorageButton) {
-        saveStorageButton.addEventListener("click", () => saveTemplateToStorage(dragDropArea));
-    }
-
-    const loadStorageButton = document.getElementById("load-storage");
-    if (loadStorageButton) {
-        loadStorageButton.addEventListener("click", () => loadTemplateFromStorage(dragDropArea));
     }
         
     // Trigger the custom-variables-checkbox function by default
@@ -981,35 +1027,49 @@ function generateTemplateText(dragDropArea) {
         const nestableType = block.dataset.nestableType || null;
 
         // Recursively process nested blocks if this block has a nested container
-        const nestedBlocks = nestedContainer
-            ? Array.from(nestedContainer.children).map(processBlock)
-            : [];
+        const nestedBlocks = nestedContainer ? Array.from(nestedContainer.children).map(processBlock) : [];
 
-        const blockData = {
-        inputBefore,
-        variable,
-        inputAfter,
-        openingTag,
-        nestableType,
-        nestedBlocks,
+        return {
+            inputBefore,
+            variable,
+            inputAfter,
+            openingTag,
+            nestableType,
+            nestedBlocks
         };
-
-        console.log("Processed block data:", blockData); // Add this line
-
-        return blockData;
     };
 
     const blocks = Array.from(dragDropArea.children);
-
     // Filter out blocks that have already been processed as nested blocks
     const topLevelBlocks = blocks.filter(block => !block.closest('.nested-container'));
-
     const workspaceBlocks = topLevelBlocks.map(processBlock);
-    const jsonString = JSON.stringify(workspaceBlocks, null, 2);
-    
+
+    // Collect extra variables state
+    const extraVariables = {
+        forSale: document.getElementById("for-sale-checkbox").checked,
+        customVariablesEnabled: document.getElementById("custom-variables-checkbox").checked,
+        customVariables: Array.from(document.querySelectorAll("#custom-variables-inputs table tr"))
+        .filter(row => row.querySelector("input[type='text']").value.trim() !== "")
+        .map(row => ({
+            label: row.querySelector("td:first-child").textContent.trim(),
+            value: row.querySelector("input[type='text']").value
+        })),
+
+        saleInfo: {
+            price: document.getElementById("sale-price").value || "",
+            currency: document.getElementById("sale-currency").value || "",
+            notes: document.getElementById("sale-notes").value || ""
+        }
+    };
+
+    const templateData = {
+        blocks: workspaceBlocks,
+        extraVariables
+    };
+
+    const jsonString = JSON.stringify(templateData, null, 2);
     // Compress the JSON for shorter, URL-safe output
     const compressed = LZString.compressToEncodedURIComponent(jsonString);
-    
     console.log("Generated Compressed Template:", compressed);
     return compressed;
 }
@@ -1022,23 +1082,30 @@ function loadTemplateFromText(dragDropArea, templateText = null) {
         return;
     }
 
-    // If no templateText provided, get from textarea (for pasted input)
     if (!templateText) {
         templateText = document.getElementById("load-template-text").value;
     }
 
     console.log("loadTemplateFromText() is running");
     try {
-        // Try to decompress the template text; if it fails or returns null, assume it's uncompressed JSON
         let decompressed = LZString.decompressFromEncodedURIComponent(templateText);
-        if (!decompressed) {
-            decompressed = templateText; // Fallback to uncompressed
+        if (!decompressed) decompressed = templateText;
+
+        let templateData = JSON.parse(decompressed);
+
+        if (Array.isArray(templateData)) {
+            templateData = {
+                blocks: templateData,
+                extraVariables: {
+                    forSale: true,
+                    customVariablesEnabled: true,
+                    customVariables: [],
+                    saleInfo: { price: "", currency: "", notes: "" }
+                }
+            };
         }
 
-        const workspaceBlocks = JSON.parse(decompressed);
         const parseBlock = (data, parentContainer) => {
-            console.log("Parsing block with data:", data);
-            // Create a block using the provided data
             const block = createBlock({
                 inputBefore: data.inputBefore || "",
                 variable: data.variable || "",
@@ -1046,17 +1113,14 @@ function loadTemplateFromText(dragDropArea, templateText = null) {
                 openingTag: data.openingTag || (data.nestableType ? `[${data.nestableType}]` : ""),
                 nestableType: data.nestableType || null,
             });
-            console.log("Created block in parseBlock:", block, "Type:", typeof block);
-            // Check if the block is a valid DOM element
+
             if (!(block instanceof HTMLElement)) {
                 console.error("Error: createBlock() did not return a valid DOM element!", block);
                 return;
             }
 
-            // Append the block to the parent container
             parentContainer.appendChild(block);
 
-            // If the block is a nestable block and has nested blocks, process them recursively
             if (data.nestableType && data.nestedBlocks) {
                 const nestedContainer = block.querySelector('.nested-container');
                 data.nestedBlocks.forEach((nestedData) => parseBlock(nestedData, nestedContainer));
@@ -1064,22 +1128,44 @@ function loadTemplateFromText(dragDropArea, templateText = null) {
         };
 
         try {
+            // --- Step 1: Restore extra variables first ---
+            const extra = templateData.extraVariables;
+
+            document.getElementById("for-sale-checkbox").checked = extra.forSale;
+            document.getElementById("custom-variables-checkbox").checked = extra.customVariablesEnabled;
+
+            // Populate sale info
+            document.getElementById("sale-price").value = extra.saleInfo.price;
+            document.getElementById("sale-currency").value = extra.saleInfo.currency;
+            document.getElementById("sale-notes").value = extra.saleInfo.notes;
+
+            // Populate custom variables (set values for the 5 fixed inputs)
+            const customInputs = document.querySelectorAll("#custom-variables-inputs input[type='text']");
+            extra.customVariables.forEach((cv, index) => {
+                if (customInputs[index]) customInputs[index].value = cv.value;
+            });
+
+            // Trigger change events to update global variable list before blocks are created
+            document.getElementById("for-sale-checkbox").dispatchEvent(new Event("change"));
+            document.getElementById("custom-variables-checkbox").dispatchEvent(new Event("change"));
+
+            // --- Step 2: Now create blocks ---
             dragDropArea.innerHTML = ""; // Clear existing blocks
+            templateData.blocks.forEach((blockData) => parseBlock(blockData, dragDropArea));
 
-            // Parse and add each top-level block
-            workspaceBlocks.forEach((blockData) => parseBlock(blockData, dragDropArea));
-
-            // Call updateBBCode after all blocks are added
+            // Step 3: Update BBCode after everything
             updateBBCode();
 
         } catch (error) {
             console.error("Error loading template:", error);
             alert("Invalid template format! Please ensure the template is properly formatted and compressed.");
         }
+
     } catch (error) {
         console.error("Error before calling createBlock:", error);
     }
 }
+
 
 // URL Based Save Functionality
 
@@ -1111,42 +1197,7 @@ function loadTemplateFromURL(dragDropArea) {
 }
 
 // Save template to localStorage with a name
-function saveTemplateToStorage(dragDropArea, name) {
-    if (!name) {
-        name = prompt("Enter a name for this template:");
-        if (!name) return;
-    }
-    try {
-        const compressedTemplate = generateTemplateText(dragDropArea);
-        localStorage.setItem(`template_${name}`, compressedTemplate);
-        alert(`Template "${name}" saved locally!`);
-    } catch (error) {
-        console.error("Error saving to storage:", error);
-        alert("Failed to save template.");
-    }
-}
 
-// Load template from localStorage by name
-function loadTemplateFromStorage(dragDropArea, name) {
-    if (!name) {
-        name = prompt("Enter the template name to load:");
-        if (!name) return;
-    }
-    const compressedTemplate = localStorage.getItem(`template_${name}`);
-    if (!compressedTemplate) {
-        alert(`Template "${name}" not found.`);
-        return;
-    }
-    if (confirm(`Load template "${name}"? This will replace current blocks.`)) {
-        loadTemplateFromText(dragDropArea, compressedTemplate);
-    }
-}
-
-// List saved templates (for a dropdown or list in UI)
-function listSavedTemplates() {
-    const keys = Object.keys(localStorage).filter(key => key.startsWith('template_'));
-    return keys.map(key => key.replace('template_', ''));
-}
 
 
 function toggleSection(sectionId) {
