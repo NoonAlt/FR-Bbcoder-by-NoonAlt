@@ -725,7 +725,7 @@ function renderPremadeBlocks() {
             { category: "Text", label: "Strikethrough", inputBefore: "[s]", variable: "", inputAfter: "[/s]" },
             { category: "Text", label: "Size", nestableType: "size=" },
             { category: "Text", label: "Color", nestableType: "color=" },
-            { category: "Alignment", label: "Columns", nestableType: "[columns]" },
+            { category: "Alignment", label: "Columns", nestableType: "columns" },
             { category: "Alignment", label: "Next Column", inputBefore: "[nextcol]", variable: "", inputAfter: "" },
             { category: "Alignment", label: "Align Center", nestableType: "center" },
             { category: "Alignment", label: "Align Right", nestableType: "right" },
