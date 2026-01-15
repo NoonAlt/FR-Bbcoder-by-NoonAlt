@@ -10,6 +10,10 @@ body {
     overflow-x: hidden;
 }
 
+html {
+    overflow-x: hidden;
+}
+
 textarea {
     width: 100%;
     padding: 0.5em;
@@ -384,6 +388,12 @@ textarea {
 .bg-pink {
     background-color: #ecb3d5;
 }
+
+.bg-pink:hover {
+    background-color: #e091c1;
+}
+
+
 
 ol.list-decimal > li::marker {
     font-weight: bold;

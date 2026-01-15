@@ -191,17 +191,6 @@ document.getElementById("clear-button").addEventListener("click", () => {
     document.getElementById("raw-input").value = "";
 });
 
-// Event listener for quick copy
-document.getElementById("quick-copy-button").addEventListener("click", () => {
-    const bbcodeResult = document.getElementById("bbcode-result");
-    bbcodeResult.select();
-    document.execCommand("copy");
-    const popup = document.getElementById('copy-popup');
-    popup.classList.add('show');
-    setTimeout(() => {
-        popup.classList.remove('show');
-    }, 3000);
-});
 
 // Generate BBCode for images
 function updateImageBBCode() {
@@ -310,6 +299,7 @@ document
 
     input.parentNode.appendChild(button); // parent is <td>
   });
+
 
 
 // Event listener for "For sale?" checkbox
@@ -733,7 +723,9 @@ function renderPremadeBlocks() {
             { category: "Text", label: "Cursive", inputBefore: "[i]", variable: "", inputAfter: "[/i]" },
             { category: "Text", label: "Underline", inputBefore: "[u]", variable: "", inputAfter: "[/u]" },
             { category: "Text", label: "Strikethrough", inputBefore: "[s]", variable: "", inputAfter: "[/s]" },
-            { category: "Alignment", label: "Columns", nestableType: "columns" },
+            { category: "Text", label: "Size", nestableType: "size=" },
+            { category: "Text", label: "Color", nestableType: "color=" },
+            { category: "Alignment", label: "Columns", nestableType: "[columns]" },
             { category: "Alignment", label: "Next Column", inputBefore: "[nextcol]", variable: "", inputAfter: "" },
             { category: "Alignment", label: "Align Center", nestableType: "center" },
             { category: "Alignment", label: "Align Right", nestableType: "right" },
@@ -970,6 +962,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Add event listener for the "Add Block" button
     const addBlockButton = document.getElementById("add-block");
     addBlockButton.addEventListener("click", () => createBlock());
+    
 
     // Listen for changes to update BBCode AND trigger debounced auto-save
     dragDropArea.addEventListener("input", () => {
@@ -991,17 +984,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Copy BBCode to clipboard
-    const copyButton = document.getElementById("copy-bbcode");
-    copyButton.addEventListener("click", () => {
-        const bbcodeResult = document.getElementById("bbcode-result");
-        bbcodeResult.select();
-        document.execCommand("copy");
-        const popup = document.getElementById('copy-popup');
-        popup.classList.add('show');
-        setTimeout(() => {
-            popup.classList.remove('show');
-        }, 3000);
+    const copyButton = document.getElementById('copy-bbcode');
+    const bbcodeResult = document.getElementById('bbcode-result');
+
+    copyButton.addEventListener('click', () => {
+    navigator.clipboard.writeText(bbcodeResult.value)
+        .then(() => showCopyConfirmation(copyButton))
+        .catch(err => console.error('Copy failed', err));
     });
+
+    // Event listener for quick copy
+    const quickCopyButton = document.getElementById('quick-copy-button');
+
+    quickCopyButton.addEventListener('click', () => {
+    navigator.clipboard.writeText(bbcodeResult.value)
+        .then(() => {
+        showCopyConfirmation(quickCopyButton);
+        })
+        .catch(err => console.error('Copy failed', err));
+    });
+
 
     // Ensure BBCode updates whenever parsedData changes
     const parseButton = document.getElementById("parse-button");
@@ -1052,6 +1054,62 @@ document.addEventListener("DOMContentLoaded", () => {
      const forSaleCheckbox = document.getElementById("for-sale-checkbox");
     forSaleCheckbox.checked = true; // Ensure the checkbox is checked
     forSaleCheckbox.dispatchEvent(new Event("change")); // Trigger the change event
+
+    // Universal copy confirmation function
+    function showCopyConfirmation(referenceElement, message = 'Copied!') {
+    // Create tooltip element
+    const tooltip = document.createElement('span');
+    tooltip.textContent = message;
+    tooltip.className = 'absolute -top-6 left-1/2 -translate-x-1/2 text-sm px-2 py-1 rounded shadow transition-opacity opacity-100';
+
+    // Make parent relative if not already
+    const wrapper = referenceElement.parentElement;
+    if (!wrapper.classList.contains('relative')) {
+        wrapper.classList.add('relative', 'inline-block');
+    }
+
+    wrapper.appendChild(tooltip);
+
+    // Fade out after 1 second
+    setTimeout(() => {
+        tooltip.classList.add('opacity-0');
+        setTimeout(() => tooltip.remove(), 500);
+    }, 1000);
+    }
+
+    // BBCode URL Generator
+    const generateButton = document.getElementById('bbcode-url-generator');
+    const modal = document.getElementById('bbcode-modal');
+    const urlTextarea = document.getElementById('bbcode-url');
+    const nameTextarea = document.getElementById('bbcode-name');
+    const urlbbcodecopyButton = document.getElementById('bbcode-copy-button');
+    const closeButton = document.getElementById('bbcode-close-button');
+
+    // Open modal
+    generateButton.addEventListener('click', () => {
+    urlTextarea.value = `[url=${window.location.href}]`;
+    nameTextarea.value = '';
+    nameTextarea.focus();
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    });
+
+    // Close modal
+    closeButton.addEventListener('click', () => {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    });
+
+    // Copy BBCode
+    urlbbcodecopyButton.addEventListener('click', () => {
+    const bbcode = `${urlTextarea.value}${nameTextarea.value}[/url]`;
+    navigator.clipboard.writeText(bbcode)
+        .then(() => showCopyConfirmation(urlbbcodecopyButton)) // <- universal confirmation
+        .catch(err => console.error('Copy failed', err));
+    });
+
+
     
 });
 

@@ -38,25 +38,31 @@
             </div>
             <h3><strong>How to use the BBcode Builder</strong></h3>
             <div id="sidebar-guide-2" class="bg-gray-100 rounded-lg border p-2 mt-2">
-              <p><strong>1.</strong> To start, press "Add Block"</p>
-              <p><strong>2.</strong> Type bbcode into "Text before" and "Text after" or select a premade block by pressing the "Pre-Made Blocks" button.</p>
+              <p><strong>1.</strong> Start by pressing the plus icon <i class="fa fa-plus" aria-hidden="true"></i> (bottom bar), which adds a new block to the builder window.</p>
+              <p><strong>2.</strong> Inside this block, type bbcode into "Text before" and "Text after" or select a premade block by pressing the "Pre-Made Blocks" button.</p>
               <p><strong>3.</strong> Select a variable from the middle drop down menu.</p>
               <p><strong>4.</strong> You can toggle additional options or add your own variables in the Extra Variables section.</p>
               <p><strong>4.</strong> Drag blocks around using the handle icon <i class="fas fa-bars"></i>. 
               <p><strong>5.</strong> Some blocks (columns, hidden, ...) can have other blocks nested into them - drag a block into the gray backgroud area, or press <i class="fa-solid fa-arrow-right-to-bracket" style="font-size: 1rem; width: 1rem; height: 1rem;"></i> on a nestable block to nest it into the block above it. Press <i class="fa-solid fa-arrow-right-from-bracket" style="font-size: 1rem; width: 1rem; height: 1rem;"></i> to unnest it again. Press the minus icon "<i class="fa-solid fa-minus" style="font-size: 1rem; width: 1rem; height: 1rem;"></i>" to collapse all nested elements.</p>
               <p><strong>6.</strong> Copy bbcode to clipboard from the "Generated BBCode" window below.</p>
-              <p><strong>7.</strong> To save your build for later use (or to share with others), click "Save Template". You can then copy the URL to share it, or bookmark the page. Drafts are saved automatically.</p>
+              <p><strong>7.</strong> To save your build for later use (or to share with others), click <i class="fa fa-download" aria-hidden="true"></i>. You can then copy the URL to share it, or bookmark the page. Drafts are saved automatically.</p>
+              <p><strong>8.</strong> If you'd like to load a template from the URL, click <i class="fa fa-upload" aria-hidden="true"></i>, or refresh the page.</p>
+              <p><strong>9.</strong> Share your template by clicking <i class="fa fa-share" aria-hidden="true"></i>, which generates a clickable BBCode link.</p>
             </div>
+            <footer class="w-full py-4 mt-auto text-sm">
+            <p>Independent third-party tool for © Flight Rising users. Images found on this site are screenshots of © Flight Rising, used for tutorial purposes. Not affiliated with Stormlight Workshop, LLC.</p><br><p class="text-center">Made by NoonAlt</p>
+            </footer>
           </div>
         </div>
       </div>
 
-  <main class="flex flex-col lg:grid lg:grid-cols-[max-content_max-content_1fr] lg:gap-8 mt-4">
+ <div class="flex justify-center flex-1">
+ <main class="flex flex-col lg:grid lg:grid-cols-[max-content_max-content_1fr] lg:gap-8 mt-4">
     <!-- Left Column -->
     <div class="w-full max-w-full lg:max-w-lg lg:ml-4">
       <!-- Section 1: Input Raw Text -->
       <section id="input-section" class="border rounded-lg shadow-lg mb-4 p-4 bg-white relative">
-        <div id="dragon-warning" class="text-red-600 text-sm mb-2 hidden"><p>warning</p></div>
+        <div id="dragon-warning" class="text-red-600 text-sm mb-2 hidden"><!--- Cotainter where warnings are auto-filled from script--></div>
         <h2 class="text-xl font-bold mb-4">Input Window</h2>
         <button class="absolute top-4 right-4 text-gray-500 hover:text-gray-700" onclick="openTutorialModal('input')">
           <i class="fa-solid fa-question-circle"></i>
@@ -64,7 +70,7 @@
         <textarea id="raw-input" rows="10" placeholder="Paste your dragon profile text here..." class="border p-2 w-full"></textarea>
         <button id="parse-button" class="bg-pink text-black p-2 mt-2 rounded-lg">Parse</button>
         <button id="clear-button" class="bg-pink text-black p-2 mt-2 rounded-lg">Clear</button>
-        <button id="quick-copy-button" class="bg-pink text-black p-2 mt-2 rounded-lg">Quick Copy</button>
+        <div class="relative inline-block"><button id="quick-copy-button" class="bg-pink text-black p-2 mt-2 rounded-lg">Quick Copy</button></div>
       </section>
   
       <!-- Section 2: Parsed Data -->
@@ -142,17 +148,19 @@
             <i id="extra-variable-toggle-arrow" class="fa-solid fa-caret-up transform transition-transform duration-300 ml-2"></i>
           </button>
         </div>
-        <div id="extra-variable-toggle" class="flex-col p-4 bg-white border-t rounded-b-lg space-y-1 z-0 relative">      
-          <div class="flex items-center space-x-2">
-            <button class="absolute right-4 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 z-20" 
+        <div id="extra-variable-toggle" class="flex-col p-4 bg-white border-t rounded-b-lg space-y-1 z-0 relative">
+          <div class="mb-4">
+          <button class="absolute right-4 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 z-20" 
                   onclick="openTutorialModal('extra-variables')">
             <i class="fa-solid fa-question-circle"></i>
-          </button>
+          </button></div>      
+          <div class="flex flex-row justify-between items-center bg-gray-100 rounded-lg border p-2">
+            
             <label for="for-sale-checkbox">For sale?</label>
             <input type="checkbox" id="for-sale-checkbox" class="circle-checkbox" checked>
           </div>
           <div id="sale-info" style="display: none;">
-            <table>
+            <table class="mt-2 mb-2">
               <tr>
                 <td>Price (enter number)</td>
                 <td><input type="text" placeholder="Type number here..." id="sale-price"></td>
@@ -176,11 +184,12 @@
                 <td><input type="text" placeholder="Type text here..." id="sale-notes"></td>
               </tr>
             </table>
+            
           </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-row justify-between items-center bg-gray-100 rounded-lg border p-2">
               <label for="display-scrolls-emojis">Display scrolls as emojis</label>
             <input type="checkbox" id="display-scrolls-emojis" class="circle-checkbox"></div>
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-row justify-between items-center bg-gray-100 rounded-lg border p-2">
               <label for="custom-variables-checkbox">Custom variables</label>
               <input type="checkbox" id="custom-variables-checkbox" class="circle-checkbox" checked>
             </div>
@@ -229,11 +238,20 @@
           <div id="bbcode-builder">
               <div id="drag-drop-area" class="border-2 border-dashed border-gray-300">
               </div>
-              <button id="add-block" class="bg-pink text-black p-2 mt-2 rounded-lg">Add Block</button>
-              <button id="toggle-premade-panel" class="bg-pink text-black p-2 mt-2 rounded-lg">Pre-Made Blocks</button>
+              <div class="flex flex-row justify-between mt-4 gap-4 border-2 bg-gray-100 border-gray-300 p-2 rounded-lg">
+              <div>
+              <button id="add-block" class="bg-pink text-black p-2 rounded-lg" style="line-height: 0;"><i class="fa fa-plus" aria-hidden="true"></i></button>
+              </div>
+              <div>
+              <button id="save-url" class="bg-pink text-black p-2 rounded-lg" style="line-height: 0;"><i class="fa fa-download" aria-hidden="true"></i></button>
+              <button id="load-url" class="bg-pink text-black p-2 rounded-lg" style="line-height: 0;"><i class="fa fa-upload" aria-hidden="true"></i></button>
+              <button id="bbcode-url-generator" class="bg-pink text-black p-2 rounded-lg" style="line-height: 0;"><i class="fa fa-share" aria-hidden="true"></i></button>
+              </div>
+              </div>
+              <div>
               <button id="bbcode-guide-button" class="bg-pink text-black p-2 mt-2 rounded-lg">BBCode Guide</button>
-              <button id="save-url" class="bg-pink text-black p-2 mt-2 rounded-lg">Save Template</button>
-              <button id="load-url" class="bg-pink text-black p-2 mt-2 rounded-lg">Load Template</button>
+              <button id="toggle-premade-panel" class="bg-pink text-black p-2 mt-2 rounded-lg">Pre-Made Blocks</button>
+              </div>
       
               <!--Pre-made blocks pannel-->
              <div id="premade-panel" class="flex-grow flex flex-col p-4 bg-gray-100 w-full">
@@ -283,7 +301,8 @@
               <div id="bbcode-output">
                 <h3 class="p-2">Generated BBCode:</h3>
                 <textarea id="bbcode-result" readonly></textarea>
-                <button id="copy-bbcode" class="bg-pink text-black p-2 mt-2 rounded-lg">Copy to Clipboard</button>
+                <div class="relative inline-block">
+                <button id="copy-bbcode" class="bg-pink text-black p-2 mt-2 rounded-lg">Copy to Clipboard</button></div>
               </div>
             </div>
         </div>
@@ -301,11 +320,44 @@
   </div>
   <div id="tutorial-modal-overlay" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-50 z-40" onclick="closeTutorialModal()"></div>
 
+<!-- URL BBcode modal -->
+<!-- BBCode Modal -->
+<div id="bbcode-modal" class="hidden fixed inset-0 bg-black/50 justify-center items-center z-50">
+  <div class="bg-white p-5 rounded-lg max-w-sm w-11/12">
+    <p class="bg-gray-100 rounded-lg border p-2 mt-2">Template links tend to be long, so it's more convenient to share them as clickable links. Provide a name for your template below, and copy a generated clickable link in BBCode format.</p>
+    <!-- Readonly URL textarea -->
+    <textarea id="bbcode-url" rows="2" 
+              class="w-full max-w-full max-h-10 overflow-x-auto resize-none border border-gray-300 rounded-md p-2" 
+              readonly></textarea>
 
-  <footer>
-    <p>&copy;</p>
-  </footer>
+    <!-- Editable name textarea -->
+    <textarea id="bbcode-name" rows="1" class="w-full max-h-10 mt-2 p-2 border border-gray-300 rounded-md resize-none" placeholder="Enter a name for your template here"></textarea>
+
+    <!-- Buttons and confirmation -->
+    <div class="mt-2 text-right">
+      <div class="relative inline-block">
+        <button id="bbcode-copy-button" 
+                class="bg-pink px-3 py-1 rounded transition">
+          Copy
+        </button>
+      </div>
+
+      <button id="bbcode-close-button" 
+              class="bg-gray-300 text-gray-800 px-3 py-1 rounded hover:bg-gray-400 transition ml-2">
+        Close
+      </button>
+    </div>
+
+    
+  </div>
+</div>
+
+
 
   <script src="js/script.js"></script>
+
+</main>
+</div>
+</div>
 </body>
 </html>
