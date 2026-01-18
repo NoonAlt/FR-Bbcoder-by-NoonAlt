@@ -458,8 +458,9 @@ function initializeDragDropArea() {
         fallbackOnBody: true,
         swapThreshold: 0.65,
         draggable: ".block:not(.nested-container)", // Prevent nested-container itself from being draggable
-        handle: window.innerWidth >= 1024 ? ".drag-handle" : null, // Regular blocks use handle on large screens, entire element on small screens
-        filter: ".nested-container", // Exclude nested containers from being treated as draggable
+        handle: ".drag-handle",
+        filter: ".nested-container, input, textarea, select, button",
+        preventOnFilter: false,
         onStart: (evt) => {
             const nestedContainer = evt.item.querySelector(".nested-container");
             if (nestedContainer) {
@@ -493,6 +494,9 @@ function initializeNestedSortable(nestedContainer) {
             fallbackOnBody: true,
             swapThreshold: 0.65,
             draggable: ".block", // Allow dragging only direct child blocks
+            handle: ".drag-handle",
+            filter: "input, textarea, select, button",
+            preventOnFilter: false,
             onStart: (evt) => {
                 if (nestedContainer.getAttribute("sortable-ignore") === "true") {
                     evt.preventDefault(); // Prevent interference with parent drag
